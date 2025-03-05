@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MechanismStates.ElbowState;
-import frc.robot.Constants.MechanismStates.ElevatorState;
 
 public class ElbowSubsystem extends SubsystemBase {
 
@@ -31,6 +30,7 @@ public class ElbowSubsystem extends SubsystemBase {
   private GenericEntry readyEntry = tab.add("Elbow Ready", false).getEntry();
   private GenericEntry positionEntry = tab.add("Elbow Position", 0).getEntry();
   private GenericEntry desiredPositionEntry = tab.add("Elbow Desired Position", 0).getEntry();
+  private GenericEntry currentStateEntry = tab.add("Current Elbow State", "").getEntry();
 
   public ElbowSubsystem() {
     motor = new TalonFX(48, "canivore");
@@ -54,7 +54,7 @@ public class ElbowSubsystem extends SubsystemBase {
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicCruiseVelocity = 40; // Target cruise velocity of 80 rps
     motionMagicConfigs.MotionMagicAcceleration = 80; // Target acceleration of 160 rps/s (0.5 seconds)
-    motionMagicConfigs.MotionMagicJerk = 800; // Target jerk of 1600 rps/s/s (0.1 seconds)
+    motionMagicConfigs.MotionMagicJerk = 400; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
     motor.getConfigurator().apply(talonFXConfigs);
 
@@ -72,6 +72,7 @@ public class ElbowSubsystem extends SubsystemBase {
     readyEntry.setBoolean(currentState == requestedState);
     positionEntry.setDouble(getPosition());
     desiredPositionEntry.setDouble(desiredPosition);
+    currentStateEntry.setString(currentState.toString());
   }
 
   public void request(ElbowState state) {

@@ -15,7 +15,6 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.MechanismStates.ElevatorState;
 import frc.robot.Constants.MechanismStates.WristState;
 
 public class WristSubsystem extends SubsystemBase {
@@ -31,6 +30,7 @@ public class WristSubsystem extends SubsystemBase {
   private GenericEntry readyEntry = tab.add("Wrist Ready", false).getEntry();
   private GenericEntry positionEntry = tab.add("Wrist Position", 0).getEntry();
   private GenericEntry desiredPositionEntry = tab.add("Wrist Desired Position", 0).getEntry();
+  private GenericEntry currentStateEntry = tab.add("Current Wrist State", "").getEntry();
 
   public WristSubsystem() {
     motor = new TalonFX(20, "canivore");
@@ -53,9 +53,9 @@ public class WristSubsystem extends SubsystemBase {
 
     // set Motion Magic settings
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
-    motionMagicConfigs.MotionMagicCruiseVelocity = 80; // Target cruise velocity of 80 rps
-    motionMagicConfigs.MotionMagicAcceleration = 160; // Target acceleration of 160 rps/s (0.5 seconds)
-    motionMagicConfigs.MotionMagicJerk = 1500; // Target jerk of 1600 rps/s/s (0.1 seconds)
+    motionMagicConfigs.MotionMagicCruiseVelocity = 70; // Target cruise velocity of 80 rps
+    motionMagicConfigs.MotionMagicAcceleration = 90; // Target acceleration of 160 rps/s (0.5 seconds)
+    motionMagicConfigs.MotionMagicJerk = 600; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
     motor.getConfigurator().apply(talonFXConfigs);
 
@@ -74,6 +74,7 @@ public class WristSubsystem extends SubsystemBase {
     readyEntry.setBoolean(currentState == requestedState);
     positionEntry.setDouble(getPosition());
     desiredPositionEntry.setDouble(desiredPosition);
+    currentStateEntry.setString(currentState.toString());
   }
 
   public void request(WristState state) {

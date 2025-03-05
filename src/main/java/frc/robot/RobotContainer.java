@@ -21,6 +21,7 @@ import frc.robot.Constants.RobotState;
 import frc.robot.Constants.MechanismStates.ElbowState;
 import frc.robot.Constants.MechanismStates.ElevatorState;
 import frc.robot.Constants.MechanismStates.WristState;
+import frc.robot.commands.roller.KeepRollerPosition;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElbowSubsystem;
@@ -58,7 +59,8 @@ public class RobotContainer {
         private final WristSubsystem wristSubsystem = new WristSubsystem();
         private final ElbowSubsystem elbowSubsystem = new ElbowSubsystem();
         private final RollerSubsystem rollerSubsystem = new RollerSubsystem();
-        private final RobotHandler robotHandler = new RobotHandler(elevatorSubsystem, elbowSubsystem, wristSubsystem, ps5Controller);
+        private final RobotHandler robotHandler = new RobotHandler(elevatorSubsystem, elbowSubsystem, wristSubsystem,
+                        ps5Controller);
 
         public RobotContainer() {
                 configureBindings();
@@ -85,10 +87,10 @@ public class RobotContainer {
                 // // (left)
                 // ));
 
-                ps5Controller.cross().whileTrue(drivetrain.applyRequest(() -> brake));
-                ps5Controller.circle().whileTrue(drivetrain.applyRequest(
-                                () -> point.withModuleDirection(
-                                                new Rotation2d(-ps5Controller.getLeftY(), -ps5Controller.getLeftX()))));
+                // ps5Controller.cross().whileTrue(drivetrain.applyRequest(() -> brake));
+                // ps5Controller.circle().whileTrue(drivetrain.applyRequest(
+                // () -> point.withModuleDirection(
+                // new Rotation2d(-ps5Controller.getLeftY(), -ps5Controller.getLeftX()))));
 
                 ps5Controller.options().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
@@ -126,10 +128,10 @@ public class RobotContainer {
                                                 elevatorSubsystem));
 
                 ps5Controller.R2().whileTrue(
-                                Commands.runEnd(() -> rollerSubsystem.setSpeed(0.2), () -> rollerSubsystem.stop(),
+                                Commands.runEnd(() -> rollerSubsystem.setSpeed(0.4), () -> rollerSubsystem.stop(),
                                                 rollerSubsystem));
                 ps5Controller.L2().whileTrue(
-                                Commands.runEnd(() -> rollerSubsystem.setSpeed(-0.2), () -> rollerSubsystem.stop(),
+                                Commands.runEnd(() -> rollerSubsystem.setSpeed(-0.4), () -> rollerSubsystem.stop(),
                                                 rollerSubsystem));
 
                 ps5Controller.triangle().onTrue(
@@ -139,6 +141,9 @@ public class RobotContainer {
                 ps5Controller.cross().onTrue(
                                 robotHandler.request(RobotState.DEFAULT));
                 ps5Controller.circle().onTrue(robotHandler.request(RobotState.AAAAAAAAAA));
+
+                ps5Controller.R1().whileTrue(new KeepRollerPosition(rollerSubsystem));
+
         }
 
         public Command getAutonomousCommand() {

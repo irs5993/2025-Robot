@@ -30,6 +30,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   private GenericEntry readyEntry = tab.add("Elevator Ready", false).getEntry();
   private GenericEntry positionEntry = tab.add("Elevator Position", 0).getEntry();
   private GenericEntry desiredPositionEntry = tab.add("Elevator Desired Position", 0).getEntry();
+  private GenericEntry currentStateEntry = tab.add("Current Elevator State", "").getEntry();
 
   public ElevatorSubsystem() {
     motor = new TalonFX(43, "canivore");
@@ -46,10 +47,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     talonFXConfigs.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     var slot0Configs = talonFXConfigs.Slot0;
-    slot0Configs.kS = 1.2; // Add 0.25 V output to overcome static friction
+    slot0Configs.kS = 1.5; // Add 0.25 V output to overcome static friction
     slot0Configs.kV = 0.15; // A velocity target of 1 rps results in 0.12 V output
     slot0Configs.kA = 0.03; // An acceleration of 1 rps/s requires 0.01 V output
-    slot0Configs.kG = 0.5;
+    slot0Configs.kG = 0.6;
 
     slot0Configs.kP = 4.8; // A position error of 2.5 rotations results in 12 V output
     slot0Configs.kI = 0; // no output for integrated error
@@ -57,9 +58,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     // set Motion Magic settings
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
-    motionMagicConfigs.MotionMagicCruiseVelocity = 40; // Target cruise velocity of 80 rps
-    motionMagicConfigs.MotionMagicAcceleration = 80; // Target acceleration of 160 rps/s (0.5 seconds)
-    motionMagicConfigs.MotionMagicJerk = 1200; // Target jerk of 1600 rps/s/s (0.1 seconds)
+    motionMagicConfigs.MotionMagicCruiseVelocity = 30; // Target cruise velocity of 80 rps
+    motionMagicConfigs.MotionMagicAcceleration = 40; // Target acceleration of 160 rps/s (0.5 seconds)
+    motionMagicConfigs.MotionMagicJerk = 400; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
     motor.getConfigurator().apply(talonFXConfigs);
 
@@ -77,6 +78,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     readyEntry.setBoolean(currentState == requestedState);
     positionEntry.setDouble(getPosition());
     desiredPositionEntry.setDouble(desiredPosition);
+    currentStateEntry.setString(currentState.toString());
   }
 
   public void request(ElevatorState state) {
