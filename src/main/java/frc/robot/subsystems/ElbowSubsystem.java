@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MechanismStates.ElbowState;
+import frc.robot.Constants.MechanismStates.ElevatorState;
 
 public class ElbowSubsystem extends SubsystemBase {
 
@@ -89,16 +90,20 @@ public class ElbowSubsystem extends SubsystemBase {
   public void resetPosition() {
     motor.setPosition(0);
   }
-  
+
+  public ElbowState getState() {
+    return currentState;
+  }
+
   // Move this arbitrary value into constants
   public boolean atSetpoint() {
     return getError() <= 0.1;
   }
-  
+
   public double getError() {
     return Math.abs(getPosition() - desiredPosition);
   }
-  
+
   public void stop() {
     motor.stopMotor();
   }

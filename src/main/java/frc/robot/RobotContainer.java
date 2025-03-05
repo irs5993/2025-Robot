@@ -10,12 +10,14 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.RobotState;
 import frc.robot.Constants.MechanismStates.ElbowState;
 import frc.robot.Constants.MechanismStates.ElevatorState;
 import frc.robot.Constants.MechanismStates.WristState;
@@ -23,9 +25,11 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElbowSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.RobotHandler;
 import frc.robot.subsystems.RollerSubsystem;
 import frc.robot.subsystems.WristSubsystem;
 
+// #region Container
 public class RobotContainer {
         private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
                                                                                       // speed
@@ -54,6 +58,7 @@ public class RobotContainer {
         private final WristSubsystem wristSubsystem = new WristSubsystem();
         private final ElbowSubsystem elbowSubsystem = new ElbowSubsystem();
         private final RollerSubsystem rollerSubsystem = new RollerSubsystem();
+        private final RobotHandler robotHandler = new RobotHandler(elevatorSubsystem, elbowSubsystem, wristSubsystem, ps5Controller);
 
         public RobotContainer() {
                 configureBindings();
@@ -61,23 +66,24 @@ public class RobotContainer {
 
         // #region Button Bindings
         private void configureBindings() {
-                drivetrain.setDefaultCommand(
-                                drivetrain.applyRequest(() -> drive.withVelocityX(-ps5Controller.getLeftY() * MaxSpeed) // Drive
-                                                                                                                        // forward
-                                                                                                                        // with
-                                                                                                                        // negative
-                                                                                                                        // Y
-                                                                                                                        // (forward)
-                                                .withVelocityY(-ps5Controller.getLeftX() * MaxSpeed) // Drive left with
-                                                                                                     // negative X
-                                                                                                     // (left)
-                                                .withRotationalRate(-ps5Controller.getRightX() * MaxAngularRate) // Drive
-                                                                                                                 // counterclockwise
-                                                                                                                 // with
-                                                                                                                 // negative
-                                                                                                                 // X
-                                                                                                                 // (left)
-                                ));
+                // drivetrain.setDefaultCommand(
+                // drivetrain.applyRequest(() -> drive.withVelocityX(-ps5Controller.getLeftY() *
+                // MaxSpeed) // Drive
+                // // forward
+                // // with
+                // // negative
+                // // Y
+                // // (forward)
+                // .withVelocityY(-ps5Controller.getLeftX() * MaxSpeed) // Drive left with
+                // // negative X
+                // // (left)
+                // .withRotationalRate(-ps5Controller.getRightX() * MaxAngularRate) // Drive
+                // // counterclockwise
+                // // with
+                // // negative
+                // // X
+                // // (left)
+                // ));
 
                 ps5Controller.cross().whileTrue(drivetrain.applyRequest(() -> brake));
                 ps5Controller.circle().whileTrue(drivetrain.applyRequest(
@@ -119,42 +125,20 @@ public class RobotContainer {
                                 .onTrue(new InstantCommand(() -> elevatorSubsystem.request(ElevatorState.MAX),
                                                 elevatorSubsystem));
 
-                flightPad.button(10)
-                                .onTrue(new InstantCommand(() -> elevatorSubsystem.request(ElevatorState.MAX),
-                                                elevatorSubsystem)
-                                                .andThen(Commands.waitSeconds(0.1))
-                                                .andThen(new InstantCommand(
-                                                                () -> elbowSubsystem.request(ElbowState.MAX),
-                                                                elbowSubsystem))
-                                                .andThen(Commands.waitSeconds(0.1))
-                                                .andThen(new InstantCommand(
-                                                                () -> wristSubsystem.request(WristState.MAX),
-                                                                wristSubsystem)));
-
-                // flightPad.button(10)
-                // .onTrue(new InstantCommand(() ->
-                // elevatorSubsystem.request(ElevatorState.MAX),
-                // elevatorSubsystem)
-                // .andThen(Commands.waitSeconds(0.1))
-                // .andThen(new InstantCommand(
-                // () -> elbowSubsystem.request(ElbowState.MAX),
-                // elbowSubsystem))
-                // .andThen(Commands.waitSeconds(0.1))
-                // .andThen(new InstantCommand(
-                // () -> wristSubsystem.request(WristState.MAX),
-                // wristSubsystem)));
-                // flightPad.button(9)
-                // .onTrue(new InstantCommand(() ->
-                // elevatorSubsystem.request(ElevatorState.ZERO), elevatorSubsystem)
-                // .alongWith(new InstantCommand(() -> elbowSubsystem.request(ElbowState.ZERO),
-                // elbowSubsystem)));
-
                 ps5Controller.R2().whileTrue(
                                 Commands.runEnd(() -> rollerSubsystem.setSpeed(0.2), () -> rollerSubsystem.stop(),
                                                 rollerSubsystem));
                 ps5Controller.L2().whileTrue(
                                 Commands.runEnd(() -> rollerSubsystem.setSpeed(-0.2), () -> rollerSubsystem.stop(),
                                                 rollerSubsystem));
+
+                ps5Controller.triangle().onTrue(
+                                robotHandler.request(RobotState.ASLANMAX));
+                ps5Controller.square().onTrue(
+                                robotHandler.request(RobotState.ORTAHALLI));
+                ps5Controller.cross().onTrue(
+                                robotHandler.request(RobotState.DEFAULT));
+                ps5Controller.circle().onTrue(robotHandler.request(RobotState.AAAAAAAAAA));
         }
 
         public Command getAutonomousCommand() {

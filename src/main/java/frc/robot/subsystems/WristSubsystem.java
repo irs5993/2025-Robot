@@ -15,6 +15,7 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.MechanismStates.ElevatorState;
 import frc.robot.Constants.MechanismStates.WristState;
 
 public class WristSubsystem extends SubsystemBase {
@@ -91,6 +92,10 @@ public class WristSubsystem extends SubsystemBase {
 
   public void resetPosition() {
     motor.setPosition(0);
+  }
+
+  public WristState getState() {
+    return currentState;
   }
 
   public boolean atSetpoint() {

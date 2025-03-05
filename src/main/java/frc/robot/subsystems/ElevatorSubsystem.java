@@ -96,6 +96,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     motor.setPosition(0);
   }
 
+  public ElevatorState getState() {
+    return currentState;
+  }
+
   // Move this arbitrary value into constants
   public boolean atSetpoint() {
     return getError() <= 0.1;
