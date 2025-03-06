@@ -84,7 +84,7 @@ public class WristSubsystem extends SubsystemBase {
 
   public void setPosition(double setpoint) {
     motor.setControl(controller.withPosition(setpoint).withLimitReverseMotion(getPosition() <= 0)
-        .withLimitForwardMotion(getPosition() > 23));
+        .withLimitForwardMotion(getPosition() > WristState.MAX.getValue() + 0.1));
   }
 
   public double getPosition() {

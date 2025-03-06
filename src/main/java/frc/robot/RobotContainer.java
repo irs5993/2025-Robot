@@ -30,9 +30,9 @@ import frc.robot.subsystems.WristSubsystem;
 
 // #region Container
 public class RobotContainer {
-        private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
+        private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) * 0.4; // kSpeedAt12Volts desired top
                                                                                       // speed
-        private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per
+        private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond) * 0.6; // 3/4 of a rotation per
                                                                                           // second
                                                                                           // max angular velocity
 
@@ -79,69 +79,86 @@ public class RobotContainer {
                                                 // negative X
                                                 // (left)
                                                 .withRotationalRate(-ps5Controller.getRightX() * MaxAngularRate) // Drive
-                                // counterclockwise
-                                // with
-                                // negative
-                                // X
-                                // (left)
+
+                                ));
+
+                ps5Controller.L2()
+                                .whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-ps5Controller.getLeftY() *
+                                                MaxSpeed * 0.35)
+                                                .withVelocityY(-ps5Controller.getLeftX() * MaxSpeed * 0.35)
+                                                .withRotationalRate(-ps5Controller.getRightX() * MaxAngularRate * 0.35) // Drive
+
                                 ));
 
                 // ps5Controller.cross().whileTrue(drivetrain.applyRequest(() -> brake));
-                ps5Controller.povUp().whileTrue(drivetrain.applyRequest(
-                                () -> driveFacing.withTargetDirection(new Rotation2d(0))
-                                                .withVelocityX(-ps5Controller.getLeftY() *
-                                                                MaxSpeed)
-                                                .withVelocityY(-ps5Controller.getLeftX() * MaxSpeed)));
+                // ps5Controller.povUp().whileTrue(drivetrain.applyRequest(
+                //                 () -> driveFacing.withTargetDirection(new Rotation2d(0))
+                //                                 .withVelocityX(-ps5Controller.getLeftY() *
+                //                                                 MaxSpeed)
+                //                                 .withVelocityY(-ps5Controller.getLeftX() * MaxSpeed)));
 
                 ps5Controller.options().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
                 drivetrain.registerTelemetry(logger::telemeterize);
 
-                flightPad.povRight().onTrue(
-                                new InstantCommand(() -> wristSubsystem.request(WristState.MAX), wristSubsystem));
-                flightPad.povUp().onTrue(
-                                new InstantCommand(() -> wristSubsystem.request(WristState.S2), wristSubsystem));
-                flightPad.povLeft().onTrue(
-                                new InstantCommand(() -> wristSubsystem.request(WristState.S1), wristSubsystem));
-                flightPad.povDown().onTrue(
-                                new InstantCommand(() -> wristSubsystem.request(WristState.ZERO), wristSubsystem));
+                // flightPad.povRight().onTrue(
+                // new InstantCommand(() -> wristSubsystem.request(WristState.MAX),
+                // wristSubsystem));
+                // flightPad.povUp().onTrue(
+                // new InstantCommand(() -> wristSubsystem.request(WristState.S2),
+                // wristSubsystem));
+                // flightPad.povLeft().onTrue(
+                // new InstantCommand(() -> wristSubsystem.request(WristState.S1),
+                // wristSubsystem));
+                // flightPad.povDown().onTrue(
+                // new InstantCommand(() -> wristSubsystem.request(WristState.ZERO),
+                // wristSubsystem));
 
-                flightPad.button(5).onTrue(
-                                new InstantCommand(() -> elbowSubsystem.request(ElbowState.ZERO), elbowSubsystem));
-                flightPad.button(3).onTrue(
-                                new InstantCommand(() -> elbowSubsystem.request(ElbowState.S1), elbowSubsystem));
-                flightPad.button(4).onTrue(
-                                new InstantCommand(() -> elbowSubsystem.request(ElbowState.S2), elbowSubsystem));
-                flightPad.button(6).onTrue(
-                                new InstantCommand(() -> elbowSubsystem.request(ElbowState.MAX), elbowSubsystem));
+                // flightPad.button(5).onTrue(
+                // new InstantCommand(() -> elbowSubsystem.request(ElbowState.ZERO),
+                // elbowSubsystem));
+                // flightPad.button(3).onTrue(
+                // new InstantCommand(() -> elbowSubsystem.request(ElbowState.S1),
+                // elbowSubsystem));
+                // flightPad.button(4).onTrue(
+                // new InstantCommand(() -> elbowSubsystem.request(ElbowState.S2),
+                // elbowSubsystem));
+                // flightPad.button(6).onTrue(
+                // new InstantCommand(() -> elbowSubsystem.request(ElbowState.MAX),
+                // elbowSubsystem));
 
-                new Trigger(() -> flightPad.getRawAxis(2) > 0)
-                                .onTrue(new InstantCommand(() -> elevatorSubsystem.request(ElevatorState.ZERO),
-                                                elevatorSubsystem));
-                flightPad.button(1)
-                                .onTrue(new InstantCommand(() -> elevatorSubsystem.request(ElevatorState.S1),
-                                                elevatorSubsystem));
-                flightPad.button(2)
-                                .onTrue(new InstantCommand(() -> elevatorSubsystem.request(ElevatorState.S2),
-                                                elevatorSubsystem));
-                new Trigger(() -> flightPad.getRawAxis(3) > 0)
-                                .onTrue(new InstantCommand(() -> elevatorSubsystem.request(ElevatorState.MAX),
-                                                elevatorSubsystem));
+                // new Trigger(() -> flightPad.getRawAxis(2) > 0)
+                // .onTrue(new InstantCommand(() ->
+                // elevatorSubsystem.request(ElevatorState.ZERO),
+                // elevatorSubsystem));
+                // flightPad.button(1)
+                // .onTrue(new InstantCommand(() -> elevatorSubsystem.request(ElevatorState.S1),
+                // elevatorSubsystem));
+                // flightPad.button(2)
+                // .onTrue(new InstantCommand(() -> elevatorSubsystem.request(ElevatorState.S2),
+                // elevatorSubsystem));
+                // new Trigger(() -> flightPad.getRawAxis(3) > 0)
+                // .onTrue(new InstantCommand(() ->
+                // elevatorSubsystem.request(ElevatorState.MAX),
+                // elevatorSubsystem));
 
-                ps5Controller.R2().whileTrue(
-                                Commands.runEnd(() -> rollerSubsystem.setVoltage(2), () -> rollerSubsystem.stop(),
+                ps5Controller.R1().whileTrue(
+                                Commands.runEnd(() -> rollerSubsystem.setVoltage(3.5), () -> rollerSubsystem.stop(),
                                                 rollerSubsystem));
-                ps5Controller.L2().whileTrue(
-                                Commands.runEnd(() -> rollerSubsystem.setVoltage(-2), () -> rollerSubsystem.stop(),
+                ps5Controller.L1().whileTrue(
+                                Commands.runEnd(() -> rollerSubsystem.setVoltage(-3.5), () -> rollerSubsystem.stop(),
                                                 rollerSubsystem));
 
-                ps5Controller.triangle().onTrue(
-                                robotHandler.request(RobotState.ASLANMAX));
-                ps5Controller.square().onTrue(
-                                robotHandler.request(RobotState.ORTAHALLI));
+                flightPad.button(10).onTrue(
+                                robotHandler.request(RobotState.MAX));
+
                 ps5Controller.cross().onTrue(
-                                robotHandler.request(RobotState.DEFAULT));
-                ps5Controller.circle().onTrue(robotHandler.request(RobotState.AAAAAAAAAA));
+                                robotHandler.request(RobotState.ZERO));
+                ps5Controller.square().onTrue(
+                                robotHandler.request(RobotState.CORAL_L2));
+                ps5Controller.triangle().onTrue(
+                                robotHandler.request(RobotState.CORAL_L3));
+                ps5Controller.circle().onTrue(robotHandler.request(RobotState.CORAL_L4));
         }
 
         public Command getAutonomousCommand() {

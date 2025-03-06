@@ -59,7 +59,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     // set Motion Magic settings
     var motionMagicConfigs = talonFXConfigs.MotionMagic;
     motionMagicConfigs.MotionMagicCruiseVelocity = 30; // Target cruise velocity of 80 rps
-    motionMagicConfigs.MotionMagicAcceleration = 50; // Target acceleration of 160 rps/s (0.5 seconds)
+    motionMagicConfigs.MotionMagicAcceleration = 30; // Target acceleration of 160 rps/s (0.5 seconds)
     motionMagicConfigs.MotionMagicJerk = 400; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
     motor.getConfigurator().apply(talonFXConfigs);

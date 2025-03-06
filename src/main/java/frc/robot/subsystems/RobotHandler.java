@@ -25,7 +25,7 @@ public class RobotHandler extends SubsystemBase {
   private final WristSubsystem wristSubsystem;
   private final CommandPS5Controller ps5Controller;
 
-  private RobotState currentState = RobotState.DEFAULT;
+  private RobotState currentState = RobotState.ZERO;
   private RobotState requestedState = this.currentState;
 
   private ShuffleboardTab tab = Shuffleboard.getTab("Arm");

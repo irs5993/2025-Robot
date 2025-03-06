@@ -29,10 +29,11 @@ public final class Constants {
   }
 
   public enum RobotState {
-    DEFAULT(ElevatorState.ZERO, ElbowState.ZERO, WristState.ZERO),
-    ASLANMAX(ElevatorState.MAX, ElbowState.MAX, WristState.MAX),
-    ORTAHALLI(ElevatorState.S2, ElbowState.S2, WristState.ZERO),
-    AAAAAAAAAA(ElevatorState.S1, ElbowState.ZERO, WristState.S2);
+    ZERO(ElevatorState.ZERO, ElbowState.ZERO, WristState.ZERO),
+    CORAL_L2(ElevatorState.L2, ElbowState.L2, WristState.L2),
+    CORAL_L3(ElevatorState.L3, ElbowState.L3, WristState.L3),
+    CORAL_L4(ElevatorState.L4, ElbowState.L4, WristState.L4),    
+    MAX(ElevatorState.MAX, ElbowState.MAX, WristState.MAX);
 
     private final ElevatorState elevatorState;
     private final ElbowState elbowState;
@@ -60,16 +61,15 @@ public final class Constants {
   public static class MechanismStates {
     public enum ElbowState {
       ZERO(1.1),
-      S1(7),
-      S2(13),
-      MAX(20);
+      L2(6.3),
+      L3(15.5),
+      L4(21.8),
+      MAX(23);
 
       private final double value;
-
       ElbowState(double value) {
         this.value = value;
       }
-
       public double getValue() {
         return value;
       }
@@ -77,16 +77,15 @@ public final class Constants {
 
     public enum WristState {
       ZERO(0),
-      S1(7),
-      S2(13),
-      MAX(20);
+      L2(24),
+      L3(24),
+      L4(22.3),
+      MAX(25);
 
       private final double value;
-
       WristState(double value) {
         this.value = value;
       }
-
       public double getValue() {
         return value;
       }
@@ -94,16 +93,15 @@ public final class Constants {
 
     public enum ElevatorState {
       ZERO(0),
-      S1(7),
-      S2(13),
-      MAX(20);
+      L2(0),
+      L3(0),
+      L4(25),
+      MAX(26);
 
       private final double value;
-
       ElevatorState(double value) {
         this.value = value;
       }
-
       public double getValue() {
         return value;
       }
