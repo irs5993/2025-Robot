@@ -10,7 +10,6 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -44,6 +43,7 @@ public class RobotContainer {
                                                                                  // motors
         private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
         private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+        private final SwerveRequest.FieldCentricFacingAngle driveFacing = new SwerveRequest.FieldCentricFacingAngle();
 
         private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -67,29 +67,31 @@ public class RobotContainer {
 
         // #region Button Bindings
         private void configureBindings() {
-                // drivetrain.setDefaultCommand(
-                // drivetrain.applyRequest(() -> drive.withVelocityX(-ps5Controller.getLeftY() *
-                // MaxSpeed) // Drive
-                // // forward
-                // // with
-                // // negative
-                // // Y
-                // // (forward)
-                // .withVelocityY(-ps5Controller.getLeftX() * MaxSpeed) // Drive left with
-                // // negative X
-                // // (left)
-                // .withRotationalRate(-ps5Controller.getRightX() * MaxAngularRate) // Drive
-                // // counterclockwise
-                // // with
-                // // negative
-                // // X
-                // // (left)
-                // ));
+                drivetrain.setDefaultCommand(
+                                drivetrain.applyRequest(() -> drive.withVelocityX(-ps5Controller.getLeftY() *
+                                                MaxSpeed) // Drive
+                                                // forward
+                                                // with
+                                                // negative
+                                                // Y
+                                                // (forward)
+                                                .withVelocityY(-ps5Controller.getLeftX() * MaxSpeed) // Drive left with
+                                                // negative X
+                                                // (left)
+                                                .withRotationalRate(-ps5Controller.getRightX() * MaxAngularRate) // Drive
+                                // counterclockwise
+                                // with
+                                // negative
+                                // X
+                                // (left)
+                                ));
 
                 // ps5Controller.cross().whileTrue(drivetrain.applyRequest(() -> brake));
-                // ps5Controller.circle().whileTrue(drivetrain.applyRequest(
-                // () -> point.withModuleDirection(
-                // new Rotation2d(-ps5Controller.getLeftY(), -ps5Controller.getLeftX()))));
+                ps5Controller.povUp().whileTrue(drivetrain.applyRequest(
+                                () -> driveFacing.withTargetDirection(new Rotation2d(0))
+                                                .withVelocityX(-ps5Controller.getLeftY() *
+                                                                MaxSpeed)
+                                                .withVelocityY(-ps5Controller.getLeftX() * MaxSpeed)));
 
                 ps5Controller.options().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
@@ -127,10 +129,10 @@ public class RobotContainer {
                                                 elevatorSubsystem));
 
                 ps5Controller.R2().whileTrue(
-                                Commands.runEnd(() -> rollerSubsystem.setVoltage(4), () -> rollerSubsystem.stop(),
+                                Commands.runEnd(() -> rollerSubsystem.setVoltage(2), () -> rollerSubsystem.stop(),
                                                 rollerSubsystem));
                 ps5Controller.L2().whileTrue(
-                                Commands.runEnd(() -> rollerSubsystem.setVoltage(-4), () -> rollerSubsystem.stop(),
+                                Commands.runEnd(() -> rollerSubsystem.setVoltage(-2), () -> rollerSubsystem.stop(),
                                                 rollerSubsystem));
 
                 ps5Controller.triangle().onTrue(
