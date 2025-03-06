@@ -128,10 +128,10 @@ public class RobotContainer {
                                                 elevatorSubsystem));
 
                 ps5Controller.R2().whileTrue(
-                                Commands.runEnd(() -> rollerSubsystem.setSpeed(0.4), () -> rollerSubsystem.stop(),
+                                Commands.runEnd(() -> rollerSubsystem.setVoltage(4), () -> rollerSubsystem.stop(),
                                                 rollerSubsystem));
                 ps5Controller.L2().whileTrue(
-                                Commands.runEnd(() -> rollerSubsystem.setSpeed(-0.4), () -> rollerSubsystem.stop(),
+                                Commands.runEnd(() -> rollerSubsystem.setVoltage(-4), () -> rollerSubsystem.stop(),
                                                 rollerSubsystem));
 
                 ps5Controller.triangle().onTrue(
