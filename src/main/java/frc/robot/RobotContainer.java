@@ -21,7 +21,6 @@ import frc.robot.Constants.RobotState;
 import frc.robot.Constants.MechanismStates.ElbowState;
 import frc.robot.Constants.MechanismStates.ElevatorState;
 import frc.robot.Constants.MechanismStates.WristState;
-import frc.robot.commands.roller.KeepRollerPosition;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElbowSubsystem;
@@ -141,9 +140,6 @@ public class RobotContainer {
                 ps5Controller.cross().onTrue(
                                 robotHandler.request(RobotState.DEFAULT));
                 ps5Controller.circle().onTrue(robotHandler.request(RobotState.AAAAAAAAAA));
-
-                ps5Controller.R1().whileTrue(new KeepRollerPosition(rollerSubsystem));
-
         }
 
         public Command getAutonomousCommand() {
