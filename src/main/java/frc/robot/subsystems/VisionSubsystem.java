@@ -5,13 +5,24 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Vision;
+import frc.robot.LimelightHelpers;
 
 public class VisionSubsystem extends SubsystemBase {
   /** Creates a new VisionSubsystem. */
-  public VisionSubsystem() {}
+  public VisionSubsystem() {
+
+    // Switch to pipeline 0
+    LimelightHelpers.setPipelineIndex(Vision.CAMERA_LEFT, 0);
+  }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+
+  }
+
+  public int getTargetId() {
+    return (int)LimelightHelpers.getFiducialID(Vision.CAMERA_LEFT);
   }
 }

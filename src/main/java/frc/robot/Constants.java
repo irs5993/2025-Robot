@@ -28,11 +28,17 @@ public final class Constants {
     public static final int flightPadPort = 1;
   }
 
+  public static class Vision {
+    public static final String CAMERA_LEFT = "Left";
+    public static final String CAMERA_RIGHT = "Right";
+
+  }
+
   public enum RobotState {
     ZERO(ElevatorState.ZERO, ElbowState.ZERO, WristState.ZERO),
     CORAL_L2(ElevatorState.L2, ElbowState.L2, WristState.L2),
     CORAL_L3(ElevatorState.L3, ElbowState.L3, WristState.L3),
-    CORAL_L4(ElevatorState.L4, ElbowState.L4, WristState.L4),    
+    CORAL_L4(ElevatorState.L4, ElbowState.L4, WristState.L4),
     MAX(ElevatorState.MAX, ElbowState.MAX, WristState.MAX);
 
     private final ElevatorState elevatorState;
@@ -67,9 +73,11 @@ public final class Constants {
       MAX(23);
 
       private final double value;
+
       ElbowState(double value) {
         this.value = value;
       }
+
       public double getValue() {
         return value;
       }
@@ -83,9 +91,11 @@ public final class Constants {
       MAX(25);
 
       private final double value;
+
       WristState(double value) {
         this.value = value;
       }
+
       public double getValue() {
         return value;
       }
@@ -99,9 +109,11 @@ public final class Constants {
       MAX(26);
 
       private final double value;
+
       ElevatorState(double value) {
         this.value = value;
       }
+
       public double getValue() {
         return value;
       }

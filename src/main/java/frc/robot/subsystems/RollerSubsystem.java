@@ -12,12 +12,17 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 
 public class RollerSubsystem extends SubsystemBase {
 
   private final TalonFX motor;
   private final MotionMagicVoltage controller;
+  // Color sensor
 
   public RollerSubsystem() {
     motor = new TalonFX(46, "canivore");
@@ -38,6 +43,11 @@ public class RollerSubsystem extends SubsystemBase {
     slot0Configs.kD = 0.1; // A velocity error of 1 rps results in 0.1 V output
 
     motor.getConfigurator().apply(talonFXConfigs);
+
+  }
+
+  public void periodic() {
+  
 
   }
 

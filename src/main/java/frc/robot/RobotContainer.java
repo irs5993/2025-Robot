@@ -7,9 +7,20 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathConstraints;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -20,34 +31,36 @@ import frc.robot.Constants.RobotState;
 import frc.robot.Constants.MechanismStates.ElbowState;
 import frc.robot.Constants.MechanismStates.ElevatorState;
 import frc.robot.Constants.MechanismStates.WristState;
+import frc.robot.commands.AlignReef;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElbowSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.RobotHandler;
 import frc.robot.subsystems.RollerSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.WristSubsystem;
 
 // #region Container
 public class RobotContainer {
-        private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond) * 0.4; // kSpeedAt12Volts desired top
-                                                                                      // speed
-        private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond) * 0.6; // 3/4 of a rotation per
-                                                                                          // second
-                                                                                          // max angular velocity
+        private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+        private double MaxAngularRate = RotationsPerSecond.of(0.45).in(RadiansPerSecond);
 
         /* Setting up bindings for necessary control of the swerve drive platform */
         private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-                        .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+                        .withDeadband(MaxSpeed * 0.05).withRotationalDeadband(MaxAngularRate * 0.05) // Add a 10%
+                                                                                                     // deadband
                         .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive
                                                                                  // motors
         private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
         private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
-        private final SwerveRequest.FieldCentricFacingAngle driveFacing = new SwerveRequest.FieldCentricFacingAngle();
 
         private final Telemetry logger = new Telemetry(MaxSpeed);
 
         public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+
+        /* Path follower */
+        // private final SendableChooser<Command> autoChooser;
 
         private final CommandPS5Controller ps5Controller = new CommandPS5Controller(
                         Constants.OperatorConstants.ps5ControllerPort);
@@ -58,10 +71,14 @@ public class RobotContainer {
         private final WristSubsystem wristSubsystem = new WristSubsystem();
         private final ElbowSubsystem elbowSubsystem = new ElbowSubsystem();
         private final RollerSubsystem rollerSubsystem = new RollerSubsystem();
+        private final VisionSubsystem visionSubsystem = new VisionSubsystem();
         private final RobotHandler robotHandler = new RobotHandler(elevatorSubsystem, elbowSubsystem, wristSubsystem,
                         ps5Controller);
 
         public RobotContainer() {
+                // autoChooser = AutoBuilder.buildAutoChooser("Tests");
+                // SmartDashboard.putData("Auto Mode", autoChooser);
+
                 configureBindings();
         }
 
@@ -69,16 +86,9 @@ public class RobotContainer {
         private void configureBindings() {
                 drivetrain.setDefaultCommand(
                                 drivetrain.applyRequest(() -> drive.withVelocityX(-ps5Controller.getLeftY() *
-                                                MaxSpeed) // Drive
-                                                // forward
-                                                // with
-                                                // negative
-                                                // Y
-                                                // (forward)
-                                                .withVelocityY(-ps5Controller.getLeftX() * MaxSpeed) // Drive left with
-                                                // negative X
-                                                // (left)
-                                                .withRotationalRate(-ps5Controller.getRightX() * MaxAngularRate) // Drive
+                                                MaxSpeed)
+                                                .withVelocityY(-ps5Controller.getLeftX() * MaxSpeed)
+                                                .withRotationalRate(-ps5Controller.getRightX() * MaxAngularRate)
 
                                 ));
 
@@ -86,18 +96,21 @@ public class RobotContainer {
                                 .whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-ps5Controller.getLeftY() *
                                                 MaxSpeed * 0.35)
                                                 .withVelocityY(-ps5Controller.getLeftX() * MaxSpeed * 0.35)
-                                                .withRotationalRate(-ps5Controller.getRightX() * MaxAngularRate * 0.35) // Drive
+                                                .withRotationalRate(-ps5Controller.getRightX() * MaxAngularRate * 0.35)
 
                                 ));
 
                 // ps5Controller.cross().whileTrue(drivetrain.applyRequest(() -> brake));
                 // ps5Controller.povUp().whileTrue(drivetrain.applyRequest(
-                //                 () -> driveFacing.withTargetDirection(new Rotation2d(0))
-                //                                 .withVelocityX(-ps5Controller.getLeftY() *
-                //                                                 MaxSpeed)
-                //                                 .withVelocityY(-ps5Controller.getLeftX() * MaxSpeed)));
+                // () -> driveFacing.withTargetDirection(new Rotation2d(0))
+                // .withVelocityX(-ps5Controller.getLeftY() *
+                // MaxSpeed)
+                // .withVelocityY(-ps5Controller.getLeftX() * MaxSpeed)));
 
-                ps5Controller.options().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+                ps5Controller.options().onTrue(drivetrain.runOnce(() -> {
+                        drivetrain.resetPose(new Pose2d(5.321046 + 3.525, 8.05 / 2 - 0.70, new Rotation2d()));
+                        drivetrain.seedFieldCentric();
+                }));
 
                 drivetrain.registerTelemetry(logger::telemeterize);
 
@@ -159,9 +172,21 @@ public class RobotContainer {
                 ps5Controller.triangle().onTrue(
                                 robotHandler.request(RobotState.CORAL_L3));
                 ps5Controller.circle().onTrue(robotHandler.request(RobotState.CORAL_L4));
+
+                ps5Controller.povUp().whileTrue(new AlignReef(drivetrain, visionSubsystem));
+                ps5Controller.povDown().whileTrue(
+                                AutoBuilder.pathfindToPose(
+                                                new Pose2d(5.321046 + 3.525, 8.05 / 2 - 0.70, new Rotation2d()),
+                                                new PathConstraints(
+                                                                2, 2,
+                                                                Units.degreesToRadians(540),
+                                                                Units.degreesToRadians(720)),
+                                                0.0));
+
         }
 
         public Command getAutonomousCommand() {
-                return Commands.print("No autonomous command configured");
+                return new PathPlannerAuto("New Auto");
+
         }
 }
