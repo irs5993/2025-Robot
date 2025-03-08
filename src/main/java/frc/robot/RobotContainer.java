@@ -13,24 +13,14 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathConstraints;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.AngleUnit;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.RobotState;
-import frc.robot.Constants.MechanismStates.ElbowState;
-import frc.robot.Constants.MechanismStates.ElevatorState;
-import frc.robot.Constants.MechanismStates.WristState;
 import frc.robot.commands.AlignReef;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -57,8 +47,6 @@ public class RobotContainer {
 
         private final Telemetry logger = new Telemetry(MaxSpeed);
 
-        public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-
         /* Path follower */
         // private final SendableChooser<Command> autoChooser;
 
@@ -74,6 +62,7 @@ public class RobotContainer {
         private final VisionSubsystem visionSubsystem = new VisionSubsystem();
         private final RobotHandler robotHandler = new RobotHandler(elevatorSubsystem, elbowSubsystem, wristSubsystem,
                         ps5Controller);
+        public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain(visionSubsystem);
 
         public RobotContainer() {
                 // autoChooser = AutoBuilder.buildAutoChooser("Tests");

@@ -29,8 +29,8 @@ public final class Constants {
   }
 
   public static class Vision {
-    public static final String CAMERA_LEFT = "Left";
-    public static final String CAMERA_RIGHT = "Right";
+    public static final String LIMELIGHT_3 = "limelight";
+    public static final String LIMELIGHT_3G = "limelight-threeg";
 
   }
 

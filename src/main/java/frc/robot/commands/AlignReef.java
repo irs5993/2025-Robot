@@ -17,6 +17,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -34,6 +36,8 @@ public class AlignReef extends Command {
   private final double maxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
   private final AprilTagFieldLayout layout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
+  
+
   public AlignReef(CommandSwerveDrivetrain drivetrain, VisionSubsystem visionSubsystem) {
     this.drivetrain = drivetrain;
     this.visionSubsystem = visionSubsystem;
@@ -49,42 +53,21 @@ public class AlignReef extends Command {
   @Override
   public void execute() {
 
-    // int tagId = visionSubsystem.getTargetId();
-    int tagId = 21;
-    var getTagPose = layout.getTagPose(tagId);
-
-    Pose2d tagPose;
-    if (getTagPose.isPresent()) {
-      tagPose = getTagPose.get().toPose2d();
-    } else {
-      return;
-    }
-
-    Translation2d slot1Translation = new Translation2d(0.2, 0.25);
-    Translation2d slot2Translation = new Translation2d(0.2, -0.25);
-
-    slot1Translation = slot1Translation.rotateBy(tagPose.getRotation());
-    slot2Translation = slot2Translation.rotateBy(tagPose.getRotation());
-
-    Transform2d slot1Transform = new Transform2d(slot1Translation, new Rotation2d());
-    Transform2d slot2Transform = new Transform2d(slot2Translation, new Rotation2d());
-
-    Pose2d slot1 = tagPose.transformBy(slot1Transform);
-    Pose2d slot2 = tagPose.transformBy(slot2Transform);
-
+    
+    
     // drivetrain
     // .applyRequest(() -> driveFacing.withTargetDirection(new Rotation2d())
     // .withVelocityX(x *
     // maxSpeed)
     // .withVelocityY(y * maxSpeed));
 
-    CommandScheduler.getInstance().schedule(
-        AutoBuilder.pathfindToPose(
-            new Pose2d(slot1.getX(), slot1.getY(), new Rotation2d(Math.PI)),
-            new PathConstraints(
-                2, 2,
-                Units.degreesToRadians(540), Units.degreesToRadians(720)),
-            0.0));
+    // CommandScheduler.getInstance().schedule(
+    //     AutoBuilder.pathfindToPose(
+    //         new Pose2d(slot1.getX(), slot1.getY(), new Rotation2d(Math.PI)),
+    //         new PathConstraints(
+    //             2, 2,
+    //             Units.degreesToRadians(540), Units.degreesToRadians(720)),
+    //         0.0));
 
   }
 
