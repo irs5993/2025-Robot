@@ -45,6 +45,9 @@ public class VisionSubsystem extends SubsystemBase {
   StructPublisher<Pose2d> algeaPublisher = NetworkTableInstance.getDefault()
       .getStructTopic("Algea", Pose2d.struct).publish();
 
+  StructPublisher<Pose2d> algaeOffsetPublisher = NetworkTableInstance.getDefault()
+      .getStructTopic("Algae Offset", Pose2d.struct).publish();
+
   public VisionSubsystem() {
     LimelightHelpers.setPipelineIndex(Vision.LIMELIGHT_3, 0);
   }
@@ -94,9 +97,9 @@ public class VisionSubsystem extends SubsystemBase {
 
     Pose2d tagPose = tagPoseOptional.get();
 
-    Translation2d coral1Translation = new Translation2d(0.8, 0.23);
-    Translation2d coral2Translation = new Translation2d(0.8, -0.23);
-    Translation2d algeaTranslation = new Translation2d(0.8, 0);
+    Translation2d coral1Translation = new Translation2d(0.9, 0.2);
+    Translation2d coral2Translation = new Translation2d(0.9, -0.2);
+    Translation2d algeaTranslation = new Translation2d(0.9, 0);
 
     Transform2d coral1Transform = new Transform2d(coral1Translation, new Rotation2d(Math.PI));
     Transform2d coral2Transform = new Transform2d(coral2Translation, new Rotation2d(Math.PI));
@@ -105,6 +108,8 @@ public class VisionSubsystem extends SubsystemBase {
     coral1Pose = tagPose.transformBy(coral1Transform);
     coral2Pose = tagPose.transformBy(coral2Transform);
     algeaPose = tagPose.transformBy(algeaTransform);
+
+    algaeOffsetPublisher.set(algeaPose.transformBy(new Transform2d(new Translation2d(-0.5, 0), new Rotation2d())));
 
     // Advantagescope debug
     coral1Publisher.set(coral1Pose);

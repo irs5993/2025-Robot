@@ -7,22 +7,20 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.Constants.AlignState;
 import frc.robot.Constants.RobotState;
 import frc.robot.commands.AlignReef;
+import frc.robot.commands.DriveDistance;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElbowSubsystem;
@@ -69,6 +67,7 @@ public class RobotContainer {
                 // autoChooser = AutoBuilder.buildAutoChooser("Tests");
                 // SmartDashboard.putData("Auto Mode", autoChooser);
 
+                SmartDashboard.putData(CommandScheduler.getInstance());
                 configureBindings();
         }
 
@@ -164,8 +163,12 @@ public class RobotContainer {
                 ps5Controller.circle().onTrue(robotHandler.request(RobotState.CORAL_L4));
 
                 ps5Controller.povUp().whileTrue(
-                                new AlignReef(drivetrain, robotHandler, visionSubsystem,
-                                                AlignState.ALGEA_L1));
+                                new AlignReef(robotHandler, visionSubsystem, rollerSubsystem,
+                                                AlignState.ALGAE_L1));
+
+                                                
+                                                
+                                                                
 
                 // ps5Controller.povUp().whileTrue(
                 // AutoBuilder.pathfindToPose(

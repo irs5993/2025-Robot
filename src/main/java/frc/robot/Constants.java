@@ -40,8 +40,8 @@ public final class Constants {
     CORAL2_L2,
     CORAL2_L3,
     CORAL2_L4,
-    ALGEA_L1,
-    ALGEA_L2
+    ALGAE_L1,
+    ALGAE_L2
   }
 
   public enum RobotState {

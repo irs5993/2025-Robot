@@ -226,12 +226,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     () -> getState().Speeds, // Supplier of current robot speeds
                     // Consumer of ChassisSpeeds and feedforwards to drive the robot
                     (speeds, feedforwards) -> setControl(
-                            m_pathApplyRobotSpeeds.withSpeeds(speeds)
-                                    .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
-                                    .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
+                            m_pathApplyRobotSpeeds.withSpeeds(speeds)),
                     new PPHolonomicDriveController(
                             // PID constants for translation
-                            new PIDConstants(7, 0, 0),
+                            new PIDConstants(3, 0, 0),
                             // PID constants for rotation
                             new PIDConstants(5, 0, 0)),
                     config,
@@ -308,7 +306,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         PoseEstimate poseEstimate = visionSubsystem.getPoseEstimate();
         boolean doRejectUpdate = false;
 
-        // if our angular velocity is greater than 360 degrees per second, ignore vision updates
+        // if our angular velocity is greater than 360 degrees per second, ignore vision
+        // updates
         if (Math.abs(getState().Speeds.omegaRadiansPerSecond) > Math.PI * 2) {
             doRejectUpdate = true;
         }

@@ -4,145 +4,141 @@
 
 package frc.robot.commands;
 
-import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.events.EventScheduler;
+import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
-
-import static edu.wpi.first.units.Units.*;
-
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
+import java.util.List;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.Constants;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.AlignState;
 import frc.robot.Constants.RobotState;
-import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.RobotHandler;
 import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.RollerSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AlignReef extends Command {
 
   private final VisionSubsystem visionSubsystem;
-  private final CommandSwerveDrivetrain drivetrain;
   private final RobotHandler robotHandler;
+  private final RollerSubsystem rollerSubsystem;
 
-  private final SwerveRequest.RobotCentric drive = new SwerveRequest.RobotCentric();
-  private final double maxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+  private Command roughAlign;
+  private Command shortDrive;
 
-  private Command pathFollowingCommand;
   private Pose2d targetPose;
 
-  private RobotState armState;
   private AlignState alignState;
+  private RobotState armState;
 
   private ShuffleboardTab tab = Shuffleboard.getTab("Align Reef");
-  private GenericEntry distanceToTargetEntry = tab.add("Distance to Target", 0).getEntry();
   private GenericEntry alignStateEntry = tab.add("Align State", "").getEntry();
-  private GenericEntry armStateEntry = tab.add("Arm State", "").getEntry();
 
-  private EventScheduler scheduler = new EventScheduler();
-
-  public AlignReef(CommandSwerveDrivetrain drivetrain, RobotHandler robotHandler, VisionSubsystem visionSubsystem,
+  public AlignReef(RobotHandler robotHandler, VisionSubsystem visionSubsystem, RollerSubsystem rollerSubsystem,
       AlignState alignState) {
-    this.drivetrain = drivetrain;
-    this.visionSubsystem = visionSubsystem;
     this.robotHandler = robotHandler;
+    this.visionSubsystem = visionSubsystem;
+    this.rollerSubsystem = rollerSubsystem;
 
     this.alignState = alignState;
 
-    addRequirements(drivetrain, visionSubsystem);
+    addRequirements(visionSubsystem);
   }
 
   @Override
   public void initialize() {
     switch (alignState) {
       case CORAL1_L2:
-        armState = RobotState.CORAL_L2;
         targetPose = visionSubsystem.getCoral1Pose();
+        armState = RobotState.CORAL_L2;
         break;
       case CORAL1_L3:
-        armState = RobotState.CORAL_L3;
         targetPose = visionSubsystem.getCoral1Pose();
+        armState = RobotState.CORAL_L3;
         break;
       case CORAL1_L4:
-        armState = RobotState.CORAL_L4;
         targetPose = visionSubsystem.getCoral1Pose();
+        armState = RobotState.CORAL_L4;
         break;
       case CORAL2_L2:
-        armState = RobotState.CORAL_L2;
         targetPose = visionSubsystem.getCoral2Pose();
+        armState = RobotState.CORAL_L2;
         break;
       case CORAL2_L3:
-        armState = RobotState.CORAL_L3;
         targetPose = visionSubsystem.getCoral2Pose();
+        armState = RobotState.CORAL_L3;
         break;
       case CORAL2_L4:
-        armState = RobotState.CORAL_L4;
         targetPose = visionSubsystem.getCoral2Pose();
+        armState = RobotState.CORAL_L4;
         break;
-      case ALGEA_L1:
-        armState = RobotState.ZERO;
+      case ALGAE_L1:
         targetPose = visionSubsystem.getAlgeaPose();
+        armState = RobotState.CORAL_L2;
         break;
-      case ALGEA_L2:
-        armState = RobotState.ZERO;
+      case ALGAE_L2:
         targetPose = visionSubsystem.getAlgeaPose();
+        armState = RobotState.ZERO;
         break;
     }
 
-    alignStateEntry.setString(alignState.toString());
-    armStateEntry.setString(armState.toString());
+    if (targetPose == null) {
+      targetPose = AutoBuilder.getCurrentPose();
+    }
 
-    pathFollowingCommand = AutoBuilder.pathfindToPose(
+    alignStateEntry.setString(alignState.toString());
+
+    roughAlign = AutoBuilder.pathfindToPose(
         targetPose,
         new PathConstraints(
             1.5, 1,
             Units.degreesToRadians(360), Units.degreesToRadians(540)),
         0.0);
 
-    pathFollowingCommand.schedule();
+    roughAlign.schedule();
+
+    // List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
+    // new Pose2d(AutoBuilder.getCurrentPose().getTranslation(), Rotation2d.kZero),
+    // new Pose2d(targetPose.getTranslation(), Rotation2d.fromDegrees(0)));
+    // PathPlannerPath path = new PathPlannerPath(waypoints, new
+    // PathConstraints(1.5, 1, 0.5, 0.5), null,
+    // new GoalEndState(0, targetPose.getRotation()));
+    // path.preventFlipping = false;
+
+    // shortDrive = AutoBuilder.followPath(path);
+    // shortDrive.schedule();
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    System.out.println("executing wooo");
 
-    double distance = drivetrain.getState().Pose.getTranslation().getDistance(targetPose.getTranslation());
-    System.out.println(distance);
-
-    // distanceToTargetEntry.setDouble(distance);
-    // if (distance <= 0.05) {
-    // CommandScheduler.getInstance().cancel(pathFollowingCommand);
-    // robotHandler.request(armState);
-    // }
-
-    // CommandScheduler.getInstance().schedule(
-    // drivetrain.applyRequest(() -> drive.withVelocityX(maxSpeed * 0.3))
-    // );
-
+    if (roughAlign.isFinished()) {
+      robotHandler.request(armState).schedule();
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    pathFollowingCommand.cancel();
-    // drivetrain.applyRequest(
-    //     (() -> new SwerveRequest.SwerveDriveBrake()));
+    if (roughAlign != null) {
+      roughAlign.cancel();
+    }
+    if (shortDrive != null) {
+      shortDrive.cancel();
+    }
   }
 
   // Returns true when the command should end.
