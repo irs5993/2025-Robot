@@ -300,10 +300,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
 
-        LimelightHelpers.SetRobotOrientation(Constants.Vision.LIMELIGHT_3, getState().Pose.getRotation().getDegrees(),
+        LimelightHelpers.SetRobotOrientation(Constants.Vision.LIMELIGHT_3G, getState().Pose.getRotation().getDegrees(),
                 0, 0, 0, 0, 0);
 
-        PoseEstimate poseEstimate = visionSubsystem.getPoseEstimate();
+        PoseEstimate poseEstimate1 = visionSubsystem.getPoseEstimate(Constants.Vision.LIMELIGHT_3G);
+        // PoseEstimate poseEstimate2 =
+        // visionSubsystem.getPoseEstimate(Constants.Vision.LIMELIGHT_3);
+
         boolean doRejectUpdate = false;
 
         // if our angular velocity is greater than 360 degrees per second, ignore vision
@@ -311,15 +314,23 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Math.abs(getState().Speeds.omegaRadiansPerSecond) > Math.PI * 2) {
             doRejectUpdate = true;
         }
-        if (poseEstimate.tagCount == 0) {
-            doRejectUpdate = true;
-        }
+
         if (!doRejectUpdate) {
             // m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7,
             // 9999999));
-            addVisionMeasurement(
-                    poseEstimate.pose,
-                    poseEstimate.timestampSeconds);
+
+            if (poseEstimate1 != null) {
+                addVisionMeasurement(
+                        poseEstimate1.pose,
+                        poseEstimate1.timestampSeconds);
+            }
+
+            // if (poseEstimate2 != null) {
+            // addVisionMeasurement(
+            // poseEstimate2.pose,
+            // poseEstimate2.timestampSeconds);
+            // }
+
         }
     }
 

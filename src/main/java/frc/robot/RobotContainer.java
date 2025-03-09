@@ -8,9 +8,13 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.events.EventTrigger;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -37,14 +41,15 @@ public class RobotContainer {
 
         /* Setting up bindings for necessary control of the swerve drive platform */
         private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-                        .withDeadband(MaxSpeed * 0.05).withRotationalDeadband(MaxAngularRate * 0.05) // Add a 10%
-                                                                                                     // deadband
-                        .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive
-                                                                                 // motors
+                        .withDeadband(MaxSpeed * 0.08).withRotationalDeadband(MaxAngularRate * 0.08)
+                        .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+        private final SwerveRequest.RobotCentric robotCentric = new SwerveRequest.RobotCentric();
+
         private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
         private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
         private final Telemetry logger = new Telemetry(MaxSpeed);
+        private final SendableChooser<Command> autoChooser;
 
         /* Path follower */
         // private final SendableChooser<Command> autoChooser;
@@ -67,8 +72,24 @@ public class RobotContainer {
                 // autoChooser = AutoBuilder.buildAutoChooser("Tests");
                 // SmartDashboard.putData("Auto Mode", autoChooser);
 
-                SmartDashboard.putData(CommandScheduler.getInstance());
+                // Build an auto chooser. This will use Commands.none() as the default option.
+                autoChooser = AutoBuilder.buildAutoChooser();
+
+                // Another option that allows you to specify the default auto by its name
+                // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
+
+                SmartDashboard.putData("Auto Chooser", autoChooser);
+
+                configureAuto();
                 configureBindings();
+        }
+
+        private void configureAuto() {
+
+                // var exampleAutoCommand = new PathPlannerAuto("Test Auto");
+                // exampleAutoCommand.event("raiseArm").onTrue(robotHandler.request(RobotState.CORAL_L2));
+
+                new EventTrigger("raiseArm").onTrue(robotHandler.request(RobotState.CORAL_L2));
         }
 
         // #region Button Bindings
@@ -81,21 +102,17 @@ public class RobotContainer {
 
                                 ));
 
-                ps5Controller.L2()
-                                .whileTrue(drivetrain.applyRequest(() -> drive.withVelocityX(-ps5Controller.getLeftY() *
-                                                MaxSpeed * 0.35)
-                                                .withVelocityY(-ps5Controller.getLeftX() * MaxSpeed * 0.35)
-                                                .withRotationalRate(-ps5Controller.getRightX() * MaxAngularRate * 0.35)
+                // Snake mode
+                // ps5Controller.L2()
+                // .whileTrue(drivetrain.applyRequest(() ->
+                // drive.withVelocityX(-ps5Controller.getLeftY() *
+                // MaxSpeed * 0.35)
+                // .withVelocityY(-ps5Controller.getLeftX() * MaxSpeed * 0.35)
+                // .withRotationalRate(-ps5Controller.getRightX() * MaxAngularRate * 0.35)
 
-                                ));
+                // ));
 
-                // ps5Controller.cross().whileTrue(drivetrain.applyRequest(() -> brake));
-                // ps5Controller.povUp().whileTrue(drivetrain.applyRequest(
-                // () -> driveFacing.withTargetDirection(new Rotation2d(0))
-                // .withVelocityX(-ps5Controller.getLeftY() *
-                // MaxSpeed)
-                // .withVelocityY(-ps5Controller.getLeftX() * MaxSpeed)));
-
+                // Odometry reset
                 ps5Controller.options().onTrue(drivetrain.runOnce(() -> {
                         drivetrain.resetPose(new Pose2d(0.5, 8.0519016 / 2 - 0.25, new Rotation2d()));
                         drivetrain.seedFieldCentric();
@@ -103,47 +120,7 @@ public class RobotContainer {
 
                 drivetrain.registerTelemetry(logger::telemeterize);
 
-                // flightPad.povRight().onTrue(
-                // new InstantCommand(() -> wristSubsystem.request(WristState.MAX),
-                // wristSubsystem));
-                // flightPad.povUp().onTrue(
-                // new InstantCommand(() -> wristSubsystem.request(WristState.S2),
-                // wristSubsystem));
-                // flightPad.povLeft().onTrue(
-                // new InstantCommand(() -> wristSubsystem.request(WristState.S1),
-                // wristSubsystem));
-                // flightPad.povDown().onTrue(
-                // new InstantCommand(() -> wristSubsystem.request(WristState.ZERO),
-                // wristSubsystem));
-
-                // flightPad.button(5).onTrue(
-                // new InstantCommand(() -> elbowSubsystem.request(ElbowState.ZERO),
-                // elbowSubsystem));
-                // flightPad.button(3).onTrue(
-                // new InstantCommand(() -> elbowSubsystem.request(ElbowState.S1),
-                // elbowSubsystem));
-                // flightPad.button(4).onTrue(
-                // new InstantCommand(() -> elbowSubsystem.request(ElbowState.S2),
-                // elbowSubsystem));
-                // flightPad.button(6).onTrue(
-                // new InstantCommand(() -> elbowSubsystem.request(ElbowState.MAX),
-                // elbowSubsystem));
-
-                // new Trigger(() -> flightPad.getRawAxis(2) > 0)
-                // .onTrue(new InstantCommand(() ->
-                // elevatorSubsystem.request(ElevatorState.ZERO),
-                // elevatorSubsystem));
-                // flightPad.button(1)
-                // .onTrue(new InstantCommand(() -> elevatorSubsystem.request(ElevatorState.S1),
-                // elevatorSubsystem));
-                // flightPad.button(2)
-                // .onTrue(new InstantCommand(() -> elevatorSubsystem.request(ElevatorState.S2),
-                // elevatorSubsystem));
-                // new Trigger(() -> flightPad.getRawAxis(3) > 0)
-                // .onTrue(new InstantCommand(() ->
-                // elevatorSubsystem.request(ElevatorState.MAX),
-                // elevatorSubsystem));
-
+                // Roller motor
                 ps5Controller.R1().whileTrue(
                                 Commands.runEnd(() -> rollerSubsystem.setVoltage(3.5), () -> rollerSubsystem.stop(),
                                                 rollerSubsystem));
@@ -151,9 +128,7 @@ public class RobotContainer {
                                 Commands.runEnd(() -> rollerSubsystem.setVoltage(-3.5), () -> rollerSubsystem.stop(),
                                                 rollerSubsystem));
 
-                flightPad.button(10).onTrue(
-                                robotHandler.request(RobotState.MAX));
-
+                // Arm setpoints
                 ps5Controller.cross().onTrue(
                                 robotHandler.request(RobotState.ZERO));
                 ps5Controller.square().onTrue(
@@ -162,13 +137,39 @@ public class RobotContainer {
                                 robotHandler.request(RobotState.CORAL_L3));
                 ps5Controller.circle().onTrue(robotHandler.request(RobotState.CORAL_L4));
 
-                ps5Controller.povUp().whileTrue(
+                // Scoring with pose aligner
+                ps5Controller.R2().and(ps5Controller.square()).whileTrue(
                                 new AlignReef(robotHandler, visionSubsystem, rollerSubsystem,
-                                                AlignState.ALGAE_L1));
+                                                AlignState.CORAL1_L2));
+                ps5Controller.R2().and(ps5Controller.triangle()).whileTrue(
+                                new AlignReef(robotHandler, visionSubsystem, rollerSubsystem,
+                                                AlignState.CORAL1_L3));
+                ps5Controller.R2().and(ps5Controller.circle()).whileTrue(
+                                new AlignReef(robotHandler, visionSubsystem, rollerSubsystem,
+                                                AlignState.CORAL1_L4));
 
-                                                
-                                                
-                                                                
+                ps5Controller.L2().and(ps5Controller.square()).whileTrue(
+                                new AlignReef(robotHandler, visionSubsystem, rollerSubsystem,
+                                                AlignState.CORAL2_L2));
+                ps5Controller.L2().and(ps5Controller.triangle()).whileTrue(
+                                new AlignReef(robotHandler, visionSubsystem, rollerSubsystem,
+                                                AlignState.CORAL2_L3));
+                ps5Controller.L2().and(ps5Controller.circle()).whileTrue(
+                                new AlignReef(robotHandler, visionSubsystem, rollerSubsystem,
+                                                AlignState.CORAL2_L4));
+
+                ps5Controller.povUp().whileTrue(
+                                drivetrain.applyRequest(() -> robotCentric.withVelocityX(
+                                                MaxSpeed * 0.05)));
+                ps5Controller.povDown().whileTrue(
+                                drivetrain.applyRequest(() -> robotCentric.withVelocityX(
+                                                MaxSpeed * -0.05)));
+                ps5Controller.povRight().whileTrue(
+                                drivetrain.applyRequest(() -> robotCentric.withVelocityY(
+                                                MaxSpeed * 0.05)));
+                ps5Controller.povLeft().whileTrue(
+                                drivetrain.applyRequest(() -> robotCentric.withVelocityY(
+                                                MaxSpeed * -0.05)));
 
                 // ps5Controller.povUp().whileTrue(
                 // AutoBuilder.pathfindToPose(
@@ -193,7 +194,7 @@ public class RobotContainer {
         }
 
         public Command getAutonomousCommand() {
-                return new PathPlannerAuto("New Auto");
+                return autoChooser.getSelected();
 
         }
 }

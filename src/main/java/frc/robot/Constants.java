@@ -29,7 +29,7 @@ public final class Constants {
   }
 
   public static class Vision {
-    public static final String LIMELIGHT_3 = "limelight";
+    // public static final String LIMELIGHT_3 = "limelight";
     public static final String LIMELIGHT_3G = "limelight-threeg";
   }
 

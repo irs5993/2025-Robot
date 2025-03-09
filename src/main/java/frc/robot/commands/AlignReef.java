@@ -44,7 +44,7 @@ public class AlignReef extends Command {
   private RobotState armState;
 
   private ShuffleboardTab tab = Shuffleboard.getTab("Align Reef");
-  private GenericEntry alignStateEntry = tab.add("Align State", "").getEntry();
+  // private GenericEntry alignStateEntry = tab.add("Align State", "").getEntry();
 
   public AlignReef(RobotHandler robotHandler, VisionSubsystem visionSubsystem, RollerSubsystem rollerSubsystem,
       AlignState alignState) {
@@ -98,7 +98,7 @@ public class AlignReef extends Command {
       targetPose = AutoBuilder.getCurrentPose();
     }
 
-    alignStateEntry.setString(alignState.toString());
+    // alignStateEntry.setString(alignState.toString());
 
     roughAlign = AutoBuilder.pathfindToPose(
         targetPose,
@@ -108,36 +108,23 @@ public class AlignReef extends Command {
         0.0);
 
     roughAlign.schedule();
-
-    // List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
-    // new Pose2d(AutoBuilder.getCurrentPose().getTranslation(), Rotation2d.kZero),
-    // new Pose2d(targetPose.getTranslation(), Rotation2d.fromDegrees(0)));
-    // PathPlannerPath path = new PathPlannerPath(waypoints, new
-    // PathConstraints(1.5, 1, 0.5, 0.5), null,
-    // new GoalEndState(0, targetPose.getRotation()));
-    // path.preventFlipping = false;
-
-    // shortDrive = AutoBuilder.followPath(path);
-    // shortDrive.schedule();
+    robotHandler.request(armState).schedule();
   }
 
   @Override
   public void execute() {
-    System.out.println("executing wooo");
+    System.out.println("ben calısıyom");
 
-    if (roughAlign.isFinished()) {
-      robotHandler.request(armState).schedule();
-    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    // if (roughAlign.isFinished()) {
+    // robotHandler.request(armState).schedule();
+    // }
     if (roughAlign != null) {
       roughAlign.cancel();
-    }
-    if (shortDrive != null) {
-      shortDrive.cancel();
     }
   }
 

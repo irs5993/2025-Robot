@@ -49,7 +49,7 @@ public class VisionSubsystem extends SubsystemBase {
       .getStructTopic("Algae Offset", Pose2d.struct).publish();
 
   public VisionSubsystem() {
-    LimelightHelpers.setPipelineIndex(Vision.LIMELIGHT_3, 0);
+    LimelightHelpers.setPipelineIndex(Vision.LIMELIGHT_3G, 0);
   }
 
   @Override
@@ -67,12 +67,20 @@ public class VisionSubsystem extends SubsystemBase {
     updateSlotPositions(currentTag);
   }
 
-  public PoseEstimate getPoseEstimate() {
-    return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Vision.LIMELIGHT_3);
+  public PoseEstimate getPoseEstimate(String limelightName) {
+    PoseEstimate estimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
+
+    if (estimate != null) {
+      if (estimate.tagCount == 0) {
+        return null;
+      }
+    }
+
+    return estimate;
   }
 
   public int getTargetId() {
-    return (int) LimelightHelpers.getFiducialID(Vision.LIMELIGHT_3);
+    return (int) LimelightHelpers.getFiducialID(Vision.LIMELIGHT_3G);
     // return 21;
   }
 
@@ -97,8 +105,8 @@ public class VisionSubsystem extends SubsystemBase {
 
     Pose2d tagPose = tagPoseOptional.get();
 
-    Translation2d coral1Translation = new Translation2d(0.9, 0.2);
-    Translation2d coral2Translation = new Translation2d(0.9, -0.2);
+    Translation2d coral1Translation = new Translation2d(0.9, 0.25);
+    Translation2d coral2Translation = new Translation2d(0.9, -0.08);
     Translation2d algeaTranslation = new Translation2d(0.9, 0);
 
     Transform2d coral1Transform = new Transform2d(coral1Translation, new Rotation2d(Math.PI));
@@ -108,8 +116,6 @@ public class VisionSubsystem extends SubsystemBase {
     coral1Pose = tagPose.transformBy(coral1Transform);
     coral2Pose = tagPose.transformBy(coral2Transform);
     algeaPose = tagPose.transformBy(algeaTransform);
-
-    algaeOffsetPublisher.set(algeaPose.transformBy(new Transform2d(new Translation2d(-0.5, 0), new Rotation2d())));
 
     // Advantagescope debug
     coral1Publisher.set(coral1Pose);
