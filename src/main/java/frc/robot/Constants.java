@@ -31,7 +31,17 @@ public final class Constants {
   public static class Vision {
     public static final String LIMELIGHT_3 = "limelight";
     public static final String LIMELIGHT_3G = "limelight-threeg";
+  }
 
+  public enum AlignState {
+    CORAL1_L2,
+    CORAL1_L3,
+    CORAL1_L4,
+    CORAL2_L2,
+    CORAL2_L3,
+    CORAL2_L4,
+    ALGEA_L1,
+    ALGEA_L2
   }
 
   public enum RobotState {

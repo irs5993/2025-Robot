@@ -231,7 +231,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                                     .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
                     new PPHolonomicDriveController(
                             // PID constants for translation
-                            new PIDConstants(6.5, 0, 0),
+                            new PIDConstants(7, 0, 0),
                             // PID constants for rotation
                             new PIDConstants(5, 0, 0)),
                     config,
@@ -305,11 +305,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         LimelightHelpers.SetRobotOrientation(Constants.Vision.LIMELIGHT_3, getState().Pose.getRotation().getDegrees(),
                 0, 0, 0, 0, 0);
 
-        // if our angular velocity is greater than 360 degrees per second, ignore vision
-        // updates
-
         PoseEstimate poseEstimate = visionSubsystem.getPoseEstimate();
         boolean doRejectUpdate = false;
+
+        // if our angular velocity is greater than 360 degrees per second, ignore vision updates
         if (Math.abs(getState().Speeds.omegaRadiansPerSecond) > Math.PI * 2) {
             doRejectUpdate = true;
         }

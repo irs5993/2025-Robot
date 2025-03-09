@@ -12,14 +12,15 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathConstraints;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import frc.robot.Constants.AlignState;
 import frc.robot.Constants.RobotState;
 import frc.robot.commands.AlignReef;
 import frc.robot.generated.TunerConstants;
@@ -97,7 +98,7 @@ public class RobotContainer {
                 // .withVelocityY(-ps5Controller.getLeftX() * MaxSpeed)));
 
                 ps5Controller.options().onTrue(drivetrain.runOnce(() -> {
-                        drivetrain.resetPose(new Pose2d(5.321046 + 3.525, 8.05 / 2 - 0.70, new Rotation2d()));
+                        drivetrain.resetPose(new Pose2d(0.5, 8.0519016 / 2 - 0.25, new Rotation2d()));
                         drivetrain.seedFieldCentric();
                 }));
 
@@ -162,15 +163,29 @@ public class RobotContainer {
                                 robotHandler.request(RobotState.CORAL_L3));
                 ps5Controller.circle().onTrue(robotHandler.request(RobotState.CORAL_L4));
 
-                ps5Controller.povUp().whileTrue(new AlignReef(drivetrain, visionSubsystem));
-                ps5Controller.povDown().whileTrue(
-                                AutoBuilder.pathfindToPose(
-                                                new Pose2d(5.321046 + 3.525, 8.05 / 2 - 0.70, new Rotation2d()),
-                                                new PathConstraints(
-                                                                2, 2,
-                                                                Units.degreesToRadians(540),
-                                                                Units.degreesToRadians(720)),
-                                                0.0));
+                ps5Controller.povUp().whileTrue(
+                                new AlignReef(drivetrain, robotHandler, visionSubsystem,
+                                                AlignState.ALGEA_L1));
+
+                // ps5Controller.povUp().whileTrue(
+                // AutoBuilder.pathfindToPose(
+                // visionSubsystem.getAlgeaPose(),
+                // new PathConstraints(
+                // 1.5, 1,
+                // Units.degreesToRadians(360),
+                // Units.degreesToRadians(540)),
+                // 0.0)
+
+                // );
+
+                // ps5Controller.povDown().whileTrue(
+                // AutoBuilder.pathfindToPose(
+                // new Pose2d(5.321046 + 3.525, 8.05 / 2 - 0.70, new Rotation2d()),
+                // new PathConstraints(
+                // 2, 2,
+                // Units.degreesToRadians(540),
+                // Units.degreesToRadians(720)),
+                // 0.0));
 
         }
 

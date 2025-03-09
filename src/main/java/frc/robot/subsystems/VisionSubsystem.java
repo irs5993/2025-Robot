@@ -53,11 +53,11 @@ public class VisionSubsystem extends SubsystemBase {
   public void periodic() {
     int currentTag = getTargetId();
 
-    System.out.println(currentTag);
-
     // Check if the detected tag is a valid reef tag
-    if (currentTag == cachedTag || !reefTags.contains(currentTag)) {
-      return;
+    if (currentTag != -1) {
+      if (!reefTags.contains(currentTag)) {
+        return;
+      }
     }
 
     cachedTag = currentTag; // Update cache
@@ -70,6 +70,7 @@ public class VisionSubsystem extends SubsystemBase {
 
   public int getTargetId() {
     return (int) LimelightHelpers.getFiducialID(Vision.LIMELIGHT_3);
+    // return 21;
   }
 
   public Optional<Pose2d> getTagPose() {
@@ -83,14 +84,19 @@ public class VisionSubsystem extends SubsystemBase {
       coral1Pose = null;
       coral1Pose = null;
       algeaPose = null;
+
+      coral1Publisher.set(coral1Pose);
+      coral2Publisher.set(coral2Pose);
+      algeaPublisher.set(algeaPose);
+
       return;
     }
 
     Pose2d tagPose = tagPoseOptional.get();
 
-    Translation2d coral1Translation = new Translation2d(0.3, 0.23);
-    Translation2d coral2Translation = new Translation2d(0.3, -0.23);
-    Translation2d algeaTranslation = new Translation2d(0.3, 0);
+    Translation2d coral1Translation = new Translation2d(0.8, 0.23);
+    Translation2d coral2Translation = new Translation2d(0.8, -0.23);
+    Translation2d algeaTranslation = new Translation2d(0.8, 0);
 
     Transform2d coral1Transform = new Transform2d(coral1Translation, new Rotation2d(Math.PI));
     Transform2d coral2Transform = new Transform2d(coral2Translation, new Rotation2d(Math.PI));
@@ -111,7 +117,7 @@ public class VisionSubsystem extends SubsystemBase {
   }
 
   public Pose2d getCoral2Pose() {
-    return coral1Pose;
+    return coral2Pose;
   }
 
   public Pose2d getAlgeaPose() {
