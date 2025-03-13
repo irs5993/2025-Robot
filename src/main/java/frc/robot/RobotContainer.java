@@ -69,7 +69,7 @@ public class RobotContainer {
         public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain(visionSubsystem);
 
         public RobotContainer() {
-                // autoChooser = AutoBuilder.buildAutoChooser("Tests");
+                // autoChooser = AutoBuilder.buildAutoChooser("Tests"); 
                 // SmartDashboard.putData("Auto Mode", autoChooser);
 
                 // Build an auto chooser. This will use Commands.none() as the default option.
@@ -122,7 +122,7 @@ public class RobotContainer {
 
                 // Roller motor
                 ps5Controller.R1().whileTrue(
-                                Commands.runEnd(() -> rollerSubsystem.setVoltage(3.5), () -> rollerSubsystem.stop(),
+                                Commands.runEnd(() -> rollerSubsystem.setVoltage(2.5), () -> rollerSubsystem.stop(),
                                                 rollerSubsystem));
                 ps5Controller.L1().whileTrue(
                                 Commands.runEnd(() -> rollerSubsystem.setVoltage(-3.5), () -> rollerSubsystem.stop(),
@@ -136,6 +136,35 @@ public class RobotContainer {
                 ps5Controller.triangle().onTrue(
                                 robotHandler.request(RobotState.CORAL_L3));
                 ps5Controller.circle().onTrue(robotHandler.request(RobotState.CORAL_L4));
+
+                // Flight Pad Setpoints
+                // Arm setpoints
+                flightPad.povDown().whileTrue(
+                                drivetrain.applyRequest(() -> robotCentric.withVelocityX(
+                                                MaxSpeed * -0.05).withVelocityY(0)));
+                flightPad.povLeft().whileTrue(
+                                drivetrain.applyRequest(() -> robotCentric.withVelocityY(
+                                                MaxSpeed * +0.05).withVelocityX(0)));
+                flightPad.povUp().whileTrue(
+                                drivetrain.applyRequest(() -> robotCentric.withVelocityX(
+                                                MaxSpeed * 0.05).withVelocityY(0)));
+                flightPad.povRight().whileTrue(
+                                drivetrain.applyRequest(() -> robotCentric.withVelocityY(
+                                                MaxSpeed * -0.05).withVelocityX(0)));
+                flightPad.povUpRight().whileTrue(
+                                drivetrain.applyRequest(() -> robotCentric.withVelocityY(
+                                                MaxSpeed * -0.05).withVelocityX(MaxSpeed * 0.05)));
+                flightPad.povUpLeft().whileTrue(
+                                drivetrain.applyRequest(() -> robotCentric.withVelocityY(
+                                                MaxSpeed * 0.05).withVelocityX(MaxSpeed * 0.05)));
+                flightPad.povDownLeft().whileTrue(
+                                drivetrain.applyRequest(() -> robotCentric.withVelocityY(
+                                                MaxSpeed * 0.05).withVelocityX(MaxSpeed * -0.05)));
+                flightPad.povDownRight().whileTrue(
+                                drivetrain.applyRequest(() -> robotCentric.withVelocityY(
+                                                MaxSpeed * -0.05).withVelocityX(MaxSpeed * -0.05)));
+                flightPad.button(2).onTrue(
+                                robotHandler.request(RobotState.ALGAE_L1));
 
                 // Scoring with pose aligner
                 ps5Controller.R2().and(ps5Controller.square()).whileTrue(
@@ -160,36 +189,29 @@ public class RobotContainer {
 
                 ps5Controller.povUp().whileTrue(
                                 drivetrain.applyRequest(() -> robotCentric.withVelocityX(
-                                                MaxSpeed * 0.05)));
+                                                MaxSpeed * 0.05).withVelocityY(0)));
                 ps5Controller.povDown().whileTrue(
                                 drivetrain.applyRequest(() -> robotCentric.withVelocityX(
-                                                MaxSpeed * -0.05)));
+                                                MaxSpeed * -0.05).withVelocityY(0)));
                 ps5Controller.povRight().whileTrue(
                                 drivetrain.applyRequest(() -> robotCentric.withVelocityY(
-                                                MaxSpeed * 0.05)));
+                                                MaxSpeed * -0.05).withVelocityX(0)));
                 ps5Controller.povLeft().whileTrue(
                                 drivetrain.applyRequest(() -> robotCentric.withVelocityY(
-                                                MaxSpeed * -0.05)));
+                                                MaxSpeed * +0.05).withVelocityX(0)));
+                flightPad.button(3).whileTrue(
+                                new AlignReef(robotHandler, visionSubsystem, rollerSubsystem,
+                                                AlignState.ALGAE_L1));
+                flightPad.button(4).onTrue(
+                                Commands.run(() -> rollerSubsystem.setVoltage(4.5),
+                                                rollerSubsystem));
+                flightPad.button(1).onTrue(
+                                robotHandler.request(RobotState.MAX)
+                );
+                flightPad.button(2).whileTrue(
+                                Commands.runEnd(() -> rollerSubsystem.setVoltage(-2.5), () -> rollerSubsystem.stop(),
+                                                rollerSubsystem));
 
-                // ps5Controller.povUp().whileTrue(
-                // AutoBuilder.pathfindToPose(
-                // visionSubsystem.getAlgeaPose(),
-                // new PathConstraints(
-                // 1.5, 1,
-                // Units.degreesToRadians(360),
-                // Units.degreesToRadians(540)),
-                // 0.0)
-
-                // );
-
-                // ps5Controller.povDown().whileTrue(
-                // AutoBuilder.pathfindToPose(
-                // new Pose2d(5.321046 + 3.525, 8.05 / 2 - 0.70, new Rotation2d()),
-                // new PathConstraints(
-                // 2, 2,
-                // Units.degreesToRadians(540),
-                // Units.degreesToRadians(720)),
-                // 0.0));
 
         }
 

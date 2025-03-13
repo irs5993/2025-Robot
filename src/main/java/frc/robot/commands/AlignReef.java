@@ -86,7 +86,7 @@ public class AlignReef extends Command {
         break;
       case ALGAE_L1:
         targetPose = visionSubsystem.getAlgeaPose();
-        armState = RobotState.CORAL_L2;
+        armState = RobotState.ALGAE_L1;
         break;
       case ALGAE_L2:
         targetPose = visionSubsystem.getAlgeaPose();

@@ -49,6 +49,7 @@ public final class Constants {
     CORAL_L2(ElevatorState.L2, ElbowState.L2, WristState.L2),
     CORAL_L3(ElevatorState.L3, ElbowState.L3, WristState.L3),
     CORAL_L4(ElevatorState.L4, ElbowState.L4, WristState.L4),
+    ALGAE_L1(ElevatorState.A1, ElbowState.A1, WristState.A1),
     MAX(ElevatorState.MAX, ElbowState.MAX, WristState.MAX);
 
     private final ElevatorState elevatorState;
@@ -77,6 +78,7 @@ public final class Constants {
   public static class MechanismStates {
     public enum ElbowState {
       ZERO(1.1),
+      A1(6),
       L2(6.3),
       L3(15.5),
       L4(21.8),
@@ -95,10 +97,12 @@ public final class Constants {
 
     public enum WristState {
       ZERO(0),
+      A1(3),
       L2(24),
       L3(24),
       L4(22.3),
       MAX(25);
+
 
       private final double value;
 
@@ -116,6 +120,7 @@ public final class Constants {
       L2(0),
       L3(0),
       L4(25),
+      A1(12),
       MAX(26);
 
       private final double value;

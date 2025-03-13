@@ -105,8 +105,8 @@ public class VisionSubsystem extends SubsystemBase {
 
     Pose2d tagPose = tagPoseOptional.get();
 
-    Translation2d coral1Translation = new Translation2d(0.9, 0.25);
-    Translation2d coral2Translation = new Translation2d(0.9, -0.08);
+    Translation2d coral1Translation = new Translation2d(0.9, 0.23); // y azalırsa sola gidiyor
+    Translation2d coral2Translation = new Translation2d(0.9, -0.13);
     Translation2d algeaTranslation = new Translation2d(0.9, 0);
 
     Transform2d coral1Transform = new Transform2d(coral1Translation, new Rotation2d(Math.PI));
