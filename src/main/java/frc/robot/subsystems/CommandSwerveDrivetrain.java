@@ -22,6 +22,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -290,6 +291,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
          * This ensures driving behavior doesn't change until an explicit disable event
          * occurs during testing.
          */
+        SmartDashboard.putNumber("Pitch", getPigeon2().getPitch().getValueAsDouble());
+        SmartDashboard.putNumber("Roll", getPigeon2().getRoll().getValueAsDouble());
+
         if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
             DriverStation.getAlliance().ifPresent(allianceColor -> {
                 setOperatorPerspectiveForward(
@@ -305,7 +309,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             add = 180;
         }
 
-        LimelightHelpers.SetRobotOrientation(Constants.Vision.LIMELIGHT_3G, getState().Pose.getRotation().getDegrees() + add,
+        LimelightHelpers.SetRobotOrientation(Constants.Vision.LIMELIGHT_3G,
+                getState().Pose.getRotation().getDegrees() + add,
                 0, 0, 0, 0, 0);
 
         PoseEstimate poseEstimate1 = visionSubsystem.getPoseEstimate(Constants.Vision.LIMELIGHT_3G);
