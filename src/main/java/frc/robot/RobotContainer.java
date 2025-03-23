@@ -10,6 +10,8 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.events.EventTrigger;
+import com.pathplanner.lib.path.PathPlannerPath;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -76,6 +78,36 @@ public class RobotContainer {
 
         private void configureAuto() {
                 new EventTrigger("raiseArm").onTrue(robotHandler.request(RobotState.CORAL_L2));
+                try {
+                        PathPlannerPath toHuman = PathPlannerPath.fromPathFile("L1ToHuman");
+                        new EventTrigger("alignRight").whileTrue(
+                                        new AlignReef(robotHandler, visionSubsystem, rollerSubsystem,
+                                                        AlignState.CORAL1_L3).andThen(
+                                                                        drivetrain.applyRequest(() -> robotCentric
+                                                                                        .withVelocityX(
+                                                                                                        MaxSpeed * 0.05)
+                                                                                        .withVelocityY(0))
+                                                                                        .withTimeout(1)
+                                                                                        .andThen(
+                                                                                                        Commands.runEnd(() -> rollerSubsystem
+                                                                                                                        .setVoltage(-3.5),
+                                                                                                                        () -> rollerSubsystem
+                                                                                                                                        .stop(),
+                                                                                                                        rollerSubsystem)
+                                                                                                                        .withTimeout(1))
+                                                                                        .andThen(
+                                                                                                        drivetrain.applyRequest(
+                                                                                                                        () -> robotCentric
+                                                                                                                                        .withVelocityX(
+                                                                                                                                                        MaxSpeed * -0.05)
+                                                                                                                                        .withVelocityY(0))
+                                                                                                                        .withTimeout(1))
+                                                                                        .andThen(
+                                                                                                        AutoBuilder.followPath(
+                                                                                                                        toHuman))));
+                } catch (Exception e) {
+                }
+
         }
 
         // #region Button Bindings
@@ -89,10 +121,12 @@ public class RobotContainer {
                                 ));
 
                 // Tipping protection
-                // new Trigger(() -> Math.abs(drivetrain.getPigeon2().getPitch().getValueAsDouble()) > 15)
-                //                 .onTrue(robotHandler.request(RobotState.ZERO));
-                // new Trigger(() -> Math.abs(drivetrain.getPigeon2().getRoll().getValueAsDouble()) > 15)
-                //                 .onTrue(robotHandler.request(RobotState.ZERO));
+                // new Trigger(() ->
+                // Math.abs(drivetrain.getPigeon2().getPitch().getValueAsDouble()) > 15)
+                // .onTrue(robotHandler.request(RobotState.ZERO));
+                // new Trigger(() ->
+                // Math.abs(drivetrain.getPigeon2().getRoll().getValueAsDouble()) > 15)
+                // .onTrue(robotHandler.request(RobotState.ZERO));
 
                 // Odometry reset
                 ps5Controller.options().onTrue(drivetrain.runOnce(() -> {
