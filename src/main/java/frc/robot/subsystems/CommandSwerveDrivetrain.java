@@ -300,7 +300,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
 
-        LimelightHelpers.SetRobotOrientation(Constants.Vision.LIMELIGHT_3G, getState().Pose.getRotation().getDegrees(),
+        int add = 0;
+        if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
+            add = 180;
+        }
+
+        LimelightHelpers.SetRobotOrientation(Constants.Vision.LIMELIGHT_3G, getState().Pose.getRotation().getDegrees() + add,
                 0, 0, 0, 0, 0);
 
         PoseEstimate poseEstimate1 = visionSubsystem.getPoseEstimate(Constants.Vision.LIMELIGHT_3G);
